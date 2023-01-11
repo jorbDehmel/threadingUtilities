@@ -50,11 +50,12 @@ void Mutex<T>::unlock(T *&Data)
     return;
 }
 
+template<class T, class A>
 class ThreadPool
 {
 public:
     // Create a new pool of threads running a function
-    ThreadPool(int Size, void (*Func)());
+    ThreadPool(int Size, T Func, A Arg);
 
     // Join all threads and clean up
     ~ThreadPool();
@@ -70,7 +71,8 @@ protected:
     bool running;
 };
 
-ThreadPool::ThreadPool(int Size, void (*Func)())
+template<class T, class A>
+ThreadPool<T, A>::ThreadPool(int Size, T Func, A Arg)
 {
     size = Size;
     threadHandles = new thread *[size];
@@ -78,13 +80,14 @@ ThreadPool::ThreadPool(int Size, void (*Func)())
     running = true;
     for (int i = 0; i < size; i++)
     {
-        threadHandles[i] = new thread(Func);
+        threadHandles[i] = new thread(Func, Arg);
     }
 
     return;
 }
 
-ThreadPool::~ThreadPool()
+template<class T, class A>
+ThreadPool<T, A>::~ThreadPool()
 {
     if (running)
     {
@@ -101,7 +104,8 @@ ThreadPool::~ThreadPool()
     return;
 }
 
-void ThreadPool::joinAll()
+template<class T, class A>
+void ThreadPool<T, A>::joinAll()
 {
     for (int i = 0; i < size; i++)
     {

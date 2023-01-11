@@ -4,23 +4,25 @@
 #include <vector>
 using namespace std;
 
+const int NUMTHREADS = 4;
+
 Mutex<int> m(0);
 int id_global = 0;
 bool isRunning = true;
-int counts[5] = {0};
+int counts[NUMTHREADS] = {0};
 
-void threadFunction()
+void threadFunction(int num)
 {
     id_global++;
     int id = id_global;
 
+    int *realData;
     while (isRunning)
     {
-        int *realData;
 
         if (m.lock(realData))
         {
-            cout << "Thread "<< id << " got lock! Data is: " << *realData << "\n";
+            cout << "Thread "<< id << " got lock! Data is: " << *realData << "\n" << flush;
             (*realData)++;
             m.unlock(realData);
 
@@ -40,14 +42,14 @@ void threadFunction()
 int main()
 {    
     srand(time(NULL));
-    ThreadPool pool(5, threadFunction);
+    ThreadPool<void (*)(int), int> pool(NUMTHREADS, threadFunction, 0);
 
-    system("sleep 5");
+    system("sleep 30");
     
     isRunning = false;
     pool.joinAll();
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < NUMTHREADS; i++)
     {
         cout << "i=" << i + 1 << ": " << counts[i] << '\n';
     }

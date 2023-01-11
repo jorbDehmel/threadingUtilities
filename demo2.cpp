@@ -22,7 +22,7 @@ public:
     const string what;
     const int howMuch;
 
-    ThreadPool<void (*)(Foobar *), Foobar *> *threads;
+    ArgThreadPool<void (*)(Foobar *), Foobar *> *threads;
     Mutex<vector<string>> *strings;
 };
 
@@ -33,7 +33,7 @@ Foobar::Foobar(int NumThreads, string WhatToAdd, int HowMuch) : what(WhatToAdd),
     vector<string> temp;
     strings = new Mutex<vector<string>>(temp);
 
-    threads = new ThreadPool<void (*)(Foobar *), Foobar *>(NumThreads, &update, this);  
+    threads = new ArgThreadPool<void (*)(Foobar *), Foobar *>(NumThreads, &update, this);  
 }
 
 Foobar::~Foobar()

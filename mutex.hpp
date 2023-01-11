@@ -4,6 +4,8 @@
 #include <thread>
 using namespace std;
 
+////////////////////////////////////
+
 template <class T>
 class Mutex
 {
@@ -50,15 +52,17 @@ void Mutex<T>::unlock(T *&Data)
     return;
 }
 
+////////////////////////////////////
+
 template<class T, class A>
-class ThreadPool
+class ArgThreadPool
 {
 public:
     // Create a new pool of threads running a function
-    ThreadPool(int Size, T Func, A Arg);
+    ArgThreadPool(int Size, T Func, A Arg);
 
     // Join all threads and clean up
-    ~ThreadPool();
+    ~ArgThreadPool();
 
     // Join all threads
     void joinAll();
@@ -72,7 +76,7 @@ protected:
 };
 
 template<class T, class A>
-ThreadPool<T, A>::ThreadPool(int Size, T Func, A Arg)
+ArgThreadPool<T, A>::ArgThreadPool(int Size, T Func, A Arg)
 {
     size = Size;
     threadHandles = new thread *[size];
@@ -87,7 +91,7 @@ ThreadPool<T, A>::ThreadPool(int Size, T Func, A Arg)
 }
 
 template<class T, class A>
-ThreadPool<T, A>::~ThreadPool()
+ArgThreadPool<T, A>::~ArgThreadPool()
 {
     if (running)
     {
@@ -105,7 +109,7 @@ ThreadPool<T, A>::~ThreadPool()
 }
 
 template<class T, class A>
-void ThreadPool<T, A>::joinAll()
+void ArgThreadPool<T, A>::joinAll()
 {
     for (int i = 0; i < size; i++)
     {
@@ -115,5 +119,75 @@ void ThreadPool<T, A>::joinAll()
 
     return;
 }
+
+////////////////////////////////////
+
+template<class T>
+class ThreadPool
+{
+public:
+    // Create a new pool of threads running a function
+    ThreadPool(int Size, T Func);
+
+    // Join all threads and clean up
+    ~ThreadPool();
+
+    // Join all threads
+    void joinAll();
+
+protected:
+    // Dynamically allocated array of thread references
+    thread **threadHandles;
+
+    int size;
+    bool running;
+};
+
+template<class T>
+ThreadPool<T>::ThreadPool(int Size, T Func)
+{
+    size = Size;
+    threadHandles = new thread *[size];
+
+    running = true;
+    for (int i = 0; i < size; i++)
+    {
+        threadHandles[i] = new thread(Func);
+    }
+
+    return;
+}
+
+template<class T>
+ThreadPool<T>::~ThreadPool()
+{
+    if (running)
+    {
+        joinAll();
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        delete threadHandles[i];
+        threadHandles[i] = nullptr;
+    }
+    delete [] threadHandles;
+
+    return;
+}
+
+template<class T>
+void ThreadPool<T>::joinAll()
+{
+    for (int i = 0; i < size; i++)
+    {
+        threadHandles[i]->join();
+    }
+    running = false;
+
+    return;
+}
+
+////////////////////////////////////
 
 #endif

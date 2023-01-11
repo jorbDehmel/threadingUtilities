@@ -11,7 +11,7 @@ int id_global = 0;
 bool isRunning = true;
 int counts[NUMTHREADS] = {0};
 
-void threadFunction(int num)
+void threadFunction()
 {
     id_global++;
     int id = id_global;
@@ -42,7 +42,7 @@ void threadFunction(int num)
 int main()
 {    
     srand(time(NULL));
-    ThreadPool<void (*)(int), int> pool(NUMTHREADS, threadFunction, 0);
+    ThreadPool<void (*)()> pool(NUMTHREADS, threadFunction);
 
     system("sleep 30");
     

@@ -22,8 +22,12 @@ void threadFunction()
 
         if (m.lock(realData))
         {
-            cout << "Thread "<< id << " got lock! Data is: " << *realData << "\n" << flush;
+            cout << "Thread " << id << " got lock! Data is: " << *realData << "\n"
+                 << flush;
             (*realData)++;
+
+            int *notRealData = realData;
+
             m.unlock(realData);
 
             counts[id - 1]++;
@@ -32,7 +36,7 @@ void threadFunction()
         }
         else
         {
-            cout << "Thread "<< id << " failed to get lock.\n";
+            cout << "Thread " << id << " failed to get lock.\n";
         }
     }
 
@@ -40,12 +44,12 @@ void threadFunction()
 }
 
 int main()
-{    
+{
     srand(time(NULL));
     ThreadPool<void (*)()> pool(NUMTHREADS, threadFunction);
 
-    system("sleep 30");
-    
+    system("sleep 10");
+
     isRunning = false;
     pool.joinAll();
 

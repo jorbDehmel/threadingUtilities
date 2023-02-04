@@ -11,7 +11,7 @@ class Mutex
 {
 public:
     // Create a new Mutex from data
-    Mutex(T);
+    Mutex(T Data);
 
     // Returns true if data was loaded to Data
     bool lock(T *&Data);
@@ -24,29 +24,37 @@ protected:
     T data;
 };
 
-template<class T>
+template <class T>
 Mutex<T>::Mutex(T Data)
 {
     data = Data;
     isLocked = false;
 }
 
-template<class T>
+template <class T>
 bool Mutex<T>::lock(T *&Data)
 {
-    if (this->isLocked) {
+    if (this->isLocked)
+    {
         Data = nullptr;
         return false;
-    } else {
+    }
+    else
+    {
         Data = &data;
         isLocked = true;
         return true;
     }
 }
 
-template<class T>
+template <class T>
 void Mutex<T>::unlock(T *&Data)
 {
+    if (Data != &data)
+    {
+        throw runtime_error("Mutex contents not returned during unlock");
+    }
+
     Data = nullptr;
     isLocked = false;
     return;
@@ -54,7 +62,7 @@ void Mutex<T>::unlock(T *&Data)
 
 ////////////////////////////////////
 
-template<class T, class A>
+template <class T, class A>
 class ArgThreadPool
 {
 public:
@@ -75,7 +83,7 @@ protected:
     bool running;
 };
 
-template<class T, class A>
+template <class T, class A>
 ArgThreadPool<T, A>::ArgThreadPool(int Size, T Func, A Arg)
 {
     size = Size;
@@ -90,7 +98,7 @@ ArgThreadPool<T, A>::ArgThreadPool(int Size, T Func, A Arg)
     return;
 }
 
-template<class T, class A>
+template <class T, class A>
 ArgThreadPool<T, A>::~ArgThreadPool()
 {
     if (running)
@@ -103,12 +111,12 @@ ArgThreadPool<T, A>::~ArgThreadPool()
         delete threadHandles[i];
         threadHandles[i] = nullptr;
     }
-    delete [] threadHandles;
+    delete[] threadHandles;
 
     return;
 }
 
-template<class T, class A>
+template <class T, class A>
 void ArgThreadPool<T, A>::joinAll()
 {
     for (int i = 0; i < size; i++)
@@ -122,7 +130,7 @@ void ArgThreadPool<T, A>::joinAll()
 
 ////////////////////////////////////
 
-template<class T>
+template <class T>
 class ThreadPool
 {
 public:
@@ -143,7 +151,7 @@ protected:
     bool running;
 };
 
-template<class T>
+template <class T>
 ThreadPool<T>::ThreadPool(int Size, T Func)
 {
     size = Size;
@@ -158,7 +166,7 @@ ThreadPool<T>::ThreadPool(int Size, T Func)
     return;
 }
 
-template<class T>
+template <class T>
 ThreadPool<T>::~ThreadPool()
 {
     if (running)
@@ -171,12 +179,12 @@ ThreadPool<T>::~ThreadPool()
         delete threadHandles[i];
         threadHandles[i] = nullptr;
     }
-    delete [] threadHandles;
+    delete[] threadHandles;
 
     return;
 }
 
-template<class T>
+template <class T>
 void ThreadPool<T>::joinAll()
 {
     for (int i = 0; i < size; i++)
